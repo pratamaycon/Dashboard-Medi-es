@@ -1,4 +1,3 @@
-import argparse
 import os
 import sys
 import socket
@@ -7,18 +6,14 @@ import select
 import time
 import signal
 
-__description__ = 'A pure python ICMP ping implementation using raw sockets.'
-
-if sys.platform == "win32":
-    # On Windows, the best timer is time.clock()
-    default_timer = time.clock
+if sys.platform == "win32":     # Identificador do SO 
+    default_timer = time.clock  # No Windows, o melhor timer é o time.clock ()
 else:
-    # On most other platforms the best timer is time.time()
-    default_timer = time.time
+    default_timer = time.time   # Na maioria das outras plataformas, o melhor timer é o time.time ()
 
-NUM_PACKETS = 3
-PACKET_SIZE = 64
-WAIT_TIMEOUT = 3.0
+NUM_PACKETS = 4    # números de pacotes
+PACKET_SIZE = 64   # Tamanho de pacotes
+WAIT_TIMEOUT = 3.0  
 
 #=============================================================================#
 # ICMP parameters
@@ -31,36 +26,34 @@ MAX_SLEEP = 1000
 
 
 class MyStats:
-    thisIP = "0.0.0.0"
-    pktsSent = 0
-    pktsRcvd = 0
-    minTime = 999999999
-    maxTime = 0
-    totTime = 0
-    avrgTime = 0
-    fracLoss = 1.0
+    thisIP = "0.0.0.0"  # Máscara do IP
+    pktsSent = 0    # pacotes enviados
+    pktsRcvd = 0    # pacotes recebidos
+    minTime = 999999999 # tempo mínimo
+    maxTime = 0     # tempo máximo
+    totTime = 0     # tempo total
+    avrgTime = 0    # tempo médio
+    fracLoss = 1.0  # pacotes que fracassaram
 
 
-myStats = MyStats  # NOT Used globally anymore.
+myStats = MyStats  # Minhas estatísticas
 
 #=============================================================================#
 
 
-def checksum(source_string):
-    """
-    A port of the functionality of in_cksum() from ping.c
-    Ideally this would act on the string as a series of 16-bit ints (host
-    packed), but this works.
-    Network data is big-endian, hosts are typically little-endian
-    """
-    countTo = (int(len(source_string)/2))*2
+def checksum(source_string): # verificar a integridade de dados transmitidos
+    """Se um arquivo é exatamente o mesmo arquivo depois de uma transferência. 
+    Para verificar se não foi alterado por terceiros ou se não está corrompido."""
+    countTo = (int(len(source_string)/2))*2 # tamanho do bytes de dados
     suma = 0
     count = 0
 
-    # Handle bytes in pairs (decoding as short ints)
     loByte = 0
     hiByte = 0
     while count < countTo:
+        """Um indicador da ordem de bytes nativa. Isso terá o valor 
+        'big' em plataformas big-endian (primeiro byte mais significativo) e 
+        'little' em plataformas little-endian (menos significativo primeiro byte)."""
         if (sys.byteorder == "little"):
             loByte = source_string[count]
             hiByte = source_string[count + 1]
@@ -297,7 +290,7 @@ def verbose_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
         print("\nPYTHON PING %s (%s): %d data bytes" %
               (hostname, destIP, packet_size))
     except socket.gaierror as e:
-        print("\nPYTHON PING: Unknown host: %s (%s)" % (hostname, e.args[1]))
+        print(hostname)
         print()
         return
 
@@ -369,32 +362,27 @@ def quiet_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
 
 #=============================================================================#
 
+def verificaHost(hostname):
+ resultado = "" # String vazia
+ try:
+  socket.gethostbyname(hostname)  # Retorna o endereço de ip
+  return hostname
+ except socket.error:
+  resultado = "A solicitação ping não pôde encontrar o host %s. Verifique o nome e tente novamente."%(hostname)
+  return resultado
+
+#=============================================================================#
+
 
 def main():
 
-    parser = argparse.ArgumentParser(description=__description__)
-    parser.add_argument('-q', '--quiet', action='store_true',
-                        help='quiet output')
-    parser.add_argument('-c', '--count', type=int, default=NUM_PACKETS,
-                        help=('number of packets to be sent '
-                              '(default: %(default)s)'))
-    parser.add_argument('-W', '--timeout', type=float, default=WAIT_TIMEOUT,
-                        help=('time to wait for a response in seoncds '
-                              '(default: %(default)s)'))
-    parser.add_argument('-s', '--packet-size', type=int, default=PACKET_SIZE,
-                        help=('number of data bytes to be sent '
-                              '(default: %(default)s)'))
-    parser. add_argument('destination')
-    # args = parser.parse_args()
-
-    ping = verbose_ping
-    # if args.quiet:
-    # ping = quiet_ping
-    ping('www.google.com', timeout=5000)
-    ping('', timeout=5000)
-    # ping(args.destination, timeout=args.timeout*1000, count=args.count,
-    #      packet_size=args.packet_size)
-
+    ping = verbose_ping 
+    ping(verificaHost('www.wikipedia.org'), timeout=3000) # tentativa de ping no wikipedia
+    ping(verificaHost('172.217.29.100'), timeout=3000) # tentativa de ping no google via ip
+    ping(verificaHost('www.google.com'), timeout=3000) # tentativa de ping no google
+    ping(verificaHost('localhost'), timeout=3000) # tentativa de ping no localhost
+    ping(verificaHost('fla2019.com'), timeout=3000) # pingando em sites que não existem 
+    ping(verificaHost('ZeldaGOT.com'), timeout=3000) # pingando em sites que não existem
 
 if __name__ == '__main__':
     main()
