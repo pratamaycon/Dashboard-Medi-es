@@ -45,35 +45,29 @@ def checksum(source_string): # verificar a integridade de dados transmitidos
     """Se um arquivo é exatamente o mesmo arquivo depois de uma transferência. 
     Para verificar se não foi alterado por terceiros ou se não está corrompido."""
     countTo = (int(len(source_string)/2))*2 # tamanho do bytes de dados
-    suma = 0
-    count = 0
+    suma = 0   # soma de verificacao
+    count = 0  # contador
 
-    loByte = 0
-    hiByte = 0
+    loByte = 0 # bit menos significativo
+    hiByte = 0 # bit mais significativo
     while count < countTo:
         """Um indicador da ordem de bytes nativa. Isso terá o valor 
         'big' em plataformas big-endian (primeiro byte mais significativo) e 
         'little' em plataformas little-endian (menos significativo primeiro byte)."""
         if (sys.byteorder == "little"):
-            loByte = source_string[count]
-            hiByte = source_string[count + 1]
+            loByte = source_string[count]     # bit menos significativo
+            hiByte = source_string[count + 1] # bit mais significativo
         else:
-            loByte = source_string[count + 1]
-            hiByte = source_string[count]
-        try:     # For Python3
-            suma = suma + (hiByte * 256 + loByte)
-        except:  # For Python2
-            suma = suma + (ord(hiByte) * 256 + ord(loByte))
+            loByte = source_string[count + 1] # bit menos significativo
+            hiByte = source_string[count]     # bit mais significativo
+    
+        suma = suma + (hiByte * 256 + loByte) # soma de verificacao com os bytes 
         count += 2
 
-    # Handle last byte if applicable (odd-number of bytes)
-    # Endianness should be irrelevant in this case
     if countTo < len(source_string):  # Check for odd length
         loByte = source_string[len(source_string)-1]
-        try:      # For Python3
-            suma += loByte
-        except:   # For Python2
-            suma += ord(loByte)
+        print(loByte)
+        suma += loByte
 
     # Truncate suma to 32 bits (a variance from ping.c, which
     suma &= 0xffffffff
