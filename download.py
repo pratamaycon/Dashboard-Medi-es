@@ -24,5 +24,4 @@ with open(file_name, "wb") as f:
             dl += len(data)
             f.write(data)
             done = int(50 * dl / total_length)
-            sys.stdout.write("\r[%s%s] %s bps" % ('=' * done, ' ' * (50-done), dl//(time.clock() - start)))
-            sys.stdout.flush()
+            print("\r[%s%s] %.2f Kbps" % ('=' * done, ' ' * (50-done), dl//(time.clock() - start)/1000))
