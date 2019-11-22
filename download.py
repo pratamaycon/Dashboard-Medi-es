@@ -1,12 +1,12 @@
-import requests
-import sys
-import time
+import requests #Requests é uma biblioteca HTTP, escrita em Python, para seres humanos. Uso básico dos métodos de GRUD.
+import sys # Este módulo fornece acesso a algumas variáveis ​​usadas ou mantidas pelo interpretador.
+import time # Este módulo fornece várias funções relacionadas ao tempo
 
 
-link = "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png"
-file_name = "downloaded.png"
-start = time.clock()
-response = requests.get(link, stream=True)
+link = "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png" #variavel que vai guardar a url do arquivo a ser baixado
+file_name = "downloaded.png" # nome do arquivo
+start = time.clock() # Retorna o tempo da CPU ou o tempo real desde o início do processo
+response = requests.get(link, stream=True) # 
 with open(file_name, "wb") as f:
     print("Downloading %s" % file_name)
     response = requests.get(link, stream=True)
