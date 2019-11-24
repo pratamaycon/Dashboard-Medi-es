@@ -80,18 +80,18 @@ def checksum(source_string): # verificar a integridade de dados transmitidos
 #=============================================================================#
 
 
-def do_one(myStats, destIP, hostname, timeout, mySeqNumber, packet_size, quiet=False):
+def atraso(myStats, destIP, hostname, timeout, mySeqNumber, packet_size, quiet=False):
     """
-    Returns either the delay (in ms) or None on timeout.
+    Retorna o atraso (em ms) ou Nenhum no tempo limite.
     """
     delay = None
 
-    try:  # One could use UDP here, but it's obscure
+    try: 
         mySocket = socket.socket(
             socket.AF_INET, socket.SOCK_RAW, socket.getprotobyname("icmp"))
     except socket.error as e:
         print("failed. (socket error: '%s')" % e.args[1])
-        raise  # raise the original error
+        raise
 
     my_ID = os.getpid() & 0xFFFF
 
@@ -264,31 +264,31 @@ def signal_handler(signum, frame):
 def verbose_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
                  packet_size=PACKET_SIZE, path_finder=False):
     """
-    Send >count< ping to >destIP< with the given >timeout< and display
-    the result.
+    Envia > contador <ping para> destIP <com o tempo limite especificado> e exiba
+    o resultado.
     """
     signal.signal(signal.SIGINT, signal_handler)   # Handle Ctrl-C
     if hasattr(signal, "SIGBREAK"):
-        # Handle Ctrl-Break e.g. under Windows
+        # Manipular Ctrl-Break, por exemplo no Windows
         signal.signal(signal.SIGBREAK, signal_handler)
 
     myStats = MyStats()  # Reseta o status
 
-    mySeqNumber = 0  # Starting valuegi
+    mySeqNumber = 0  # Inicializando mySeqNumber
 
     try:
-        destIP = socket.gethostbyname(hostname)
-        print("\nPYTHON PING %s (%s): %d data bytes" %
-              (hostname, destIP, packet_size))
+        destIP = socket.gethostbyname(hostname) # Pega endereco do IP do host
+        print("\nPYTHON PING %s (%s): %d com bytes de dados" %
+              (hostname, destIP, packet_size)) # nome do host, ip destino e tamnanho do pacote 
     except socket.gaierror as e:
-        print(hostname)
+        print(hostname) # nome do host
         print()
         return
 
-    myStats.thisIP = destIP
+    myStats.thisIP = destIP # atribui o ip destino do host ao ip do Objeto myStats
 
     for i in range(count):
-        delay = do_one(myStats, destIP, hostname,
+        delay = atraso(myStats, destIP, hostname, # 
                        timeout, mySeqNumber, packet_size)
 
         if delay == None:
@@ -325,12 +325,12 @@ def quiet_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
     # loose the first packet. (while the switches find the way... :/ )
     if path_finder:
         fakeStats = MyStats()
-        do_one(fakeStats, destIP, hostname, timeout,
+        atraso(fakeStats, destIP, hostname, timeout,
                mySeqNumber, packet_size, quiet=True)
         time.sleep(0.5)
 
     for i in range(count):
-        delay = do_one(myStats, destIP, hostname, timeout,
+        delay = atraso(myStats, destIP, hostname, timeout,
                        mySeqNumber, packet_size, quiet=True)
 
         if delay == None:
