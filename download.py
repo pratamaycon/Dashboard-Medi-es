@@ -6,7 +6,7 @@ import time # Este módulo fornece várias funções relacionadas ao tempo
 link = "https://upload.wikimedia.org/wikipedia/commons/4/47/PNG_transparency_demonstration_1.png" #variavel que vai guardar a url do arquivo a ser baixado
 file_name = "downloaded.png" # nome do arquivo
 start = time.clock() # Retorna o tempo da CPU ou o tempo real desde o início do processo
-response = requests.get(link, stream=True) # 
+response = requests.get(link, stream=True) # resposta
 with open(file_name, "wb") as f:
     print("Downloading %s" % file_name)
     response = requests.get(link, stream=True)

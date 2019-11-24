@@ -1,10 +1,10 @@
-import os
-import sys
-import socket
-import struct
-import select
-import time
-import signal
+import os # Módulos com funções do SO
+import sys # Este módulo fornece acesso a algumas variáveis ​​usadas ou mantidas pelo interpretador.
+import socket # Módulo de implementação para operações de soquete.
+import struct # Funções para converter entre valores Python e estruturas C
+import select # Este módulo suporta E / S assíncronos
+import time # Este módulo fornece várias funções relacionadas ao tempo
+import signal # Este módulo fornece mecanismos para usar manipuladores de sinal em Python
 
 if sys.platform == "win32":     # Identificador do SO 
     default_timer = time.clock  # No Windows, o melhor timer é o time.clock ()
@@ -13,7 +13,7 @@ else:
 
 NUM_PACKETS = 4    # números de pacotes
 PACKET_SIZE = 64   # Tamanho de pacotes
-WAIT_TIMEOUT = 3.0  
+WAIT_TIMEOUT = 3.0  # tempo de espera para timeout
 
 #=============================================================================#
 # ICMP parameters
@@ -36,7 +36,7 @@ class MyStats:
     fracLoss = 1.0  # pacotes que fracassaram
 
 
-myStats = MyStats  # Minhas estatísticas
+myStats = MyStats  # atribuindo a Class MyStats a um Objeto myStats
 
 #=============================================================================#
 
@@ -45,40 +45,37 @@ def checksum(source_string): # verificar a integridade de dados transmitidos
     """Se um arquivo é exatamente o mesmo arquivo depois de uma transferência. 
     Para verificar se não foi alterado por terceiros ou se não está corrompido."""
     countTo = (int(len(source_string)/2))*2 # tamanho do bytes de dados
-    suma = 0   # soma de verificacao
-    count = 0  # contador
+    soma = 0   
+    count = 0  
 
-    loByte = 0 # bit menos significativo
-    hiByte = 0 # bit mais significativo
+    menosByte = 0 
+    maisByte = 0  
     while count < countTo:
         """Um indicador da ordem de bytes nativa. Isso terá o valor 
         'big' em plataformas big-endian (primeiro byte mais significativo) e 
         'little' em plataformas little-endian (menos significativo primeiro byte)."""
         if (sys.byteorder == "little"):
-            loByte = source_string[count]     # bit menos significativo
-            hiByte = source_string[count + 1] # bit mais significativo
+            menosByte = source_string[count]     
+            maisByte = source_string[count + 1] # bit mais significativo
         else:
-            loByte = source_string[count + 1] # bit menos significativo
-            hiByte = source_string[count]     # bit mais significativo
+            menosByte = source_string[count + 1] # bit menos significativo
+            maisByte = source_string[count]     
     
-        suma = suma + (hiByte * 256 + loByte) # soma de verificacao com os bytes 
+        soma = soma + (maisByte * 256 + menosByte)
         count += 2
 
-    if countTo < len(source_string):  # Check for odd length
-        loByte = source_string[len(source_string)-1]
-        print(loByte)
-        suma += loByte
+    if countTo < len(source_string):  # Verifica tamanho do bytes de dados impar
+        menosByte = source_string[len(source_string)-1] # bit menos significativo
+        soma += menosByte 
 
-    # Truncate suma to 32 bits (a variance from ping.c, which
-    suma &= 0xffffffff
-    # uses signed ints, but overflow is unlikely in ping)
+    soma &= 0xffffffff
 
-    suma = (suma >> 16) + (suma & 0xffff)    # Add high 16 bits to low 16 bits
-    suma += (suma >> 16)                    # Add carry from above (if any)
-    answer = ~suma & 0xffff                # Invert and truncate to 16 bits
-    answer = socket.htons(answer)
+    soma = (soma >> 16) + (soma & 0xffff)    
+    soma += (soma >> 16)                  
+    resposta = ~soma & 0xffff               
+    resposta = socket.htons(resposta)
 
-    return answer
+    return resposta
 
 #=============================================================================#
 
@@ -317,11 +314,11 @@ def quiet_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
     mySeqNumber = 0  # Starting value
 
     try:
-        destIP = socket.gethostbyname(hostname)
+        destIP = socket.gethostbyname(hostname) # Pega endereco do IP do host
     except socket.gaierror as e:
         return False
 
-    myStats.thisIP = destIP
+    myStats.thisIP = destIP # Atribui o ip a propriedade do Objeto 
 
     # This will send packet that we dont care about 0.5 seconds before it starts
     # acrutally pinging. This is needed in big MAN/LAN networks where you sometimes
@@ -357,13 +354,13 @@ def quiet_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
 #=============================================================================#
 
 def verificaHost(hostname):
- resultado = "" # String vazia
+ msg = "" # inicializando uma string vazia
  try:
-  socket.gethostbyname(hostname)  # Retorna o endereço de ip
-  return hostname
- except socket.error:
-  resultado = "A solicitação ping não pôde encontrar o host %s. Verifique o nome e tente novamente."%(hostname)
-  return resultado
+  socket.gethostbyname(hostname)  # retorna o endereço de ip
+  return hostname # retorna o host válido
+ except socket.error: # se não possui host válido uma exceção é disparada
+  msg = "A solicitação ping não pôde encontrar o host %s. Verifique o nome e tente novamente."%(hostname)
+  return msg # retorna a msg com erro informando o usuário
 
 #=============================================================================#
 
