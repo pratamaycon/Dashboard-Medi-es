@@ -272,9 +272,9 @@ def verbose_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
         # Handle Ctrl-Break e.g. under Windows
         signal.signal(signal.SIGBREAK, signal_handler)
 
-    myStats = MyStats()  # Reset the stats
+    myStats = MyStats()  # Reseta o status
 
-    mySeqNumber = 0  # Starting value
+    mySeqNumber = 0  # Starting valuegi
 
     try:
         destIP = socket.gethostbyname(hostname)
