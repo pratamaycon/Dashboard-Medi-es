@@ -243,7 +243,7 @@ def dump_stats(myStats):
         print("round-trip (ms)  min/avg/max = %d/%0.1f/%d" % (
             myStats.minTime, myStats.totTime/myStats.pktsRcvd, myStats.maxTime
         ))
-
+    escreveArquivo(myStats.minTime, myStats.totTime/myStats.pktsRcvd, myStats.maxTime)
     print("")
     return
 
@@ -361,6 +361,22 @@ def verificaHost(hostname):
  except socket.error: # se não possui host válido uma exceção é disparada
   msg = "A solicitação ping não pôde encontrar o host %s. Verifique o nome e tente novamente."%(hostname)
   return msg # retorna a msg com erro informando o usuário
+
+#=============================================================================#
+
+def escreveArquivo(minimo, media, maximo):
+ arquivo = open('dataset.txt','a')
+ arquivo.write(str(minimo) + '\n')
+ arquivo.write(str(media) + '\n')
+ arquivo.write(str(maximo) + '\n')
+ arquivo.close()
+
+
+#=============================================================================#
+
+def lerDataset():
+    return
+
 
 #=============================================================================#
 
