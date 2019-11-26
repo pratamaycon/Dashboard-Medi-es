@@ -1,3 +1,4 @@
+import csv
 import os # Módulos com funções do SO
 import sys # Este módulo fornece acesso a algumas variáveis ​​usadas ou mantidas pelo interpretador.
 import socket # Módulo de implementação para operações de soquete.
@@ -11,6 +12,7 @@ if sys.platform == "win32":     # Identificador do SO
 else:
     default_timer = time.time   # Na maioria das outras plataformas, o melhor timer é o time.time ()
 
+lista = []
 NUM_PACKETS = 4    # números de pacotes
 PACKET_SIZE = 64   # Tamanho de pacotes
 WAIT_TIMEOUT = 3.0  # tempo de espera para timeout
@@ -243,7 +245,10 @@ def dump_stats(myStats):
         print("round-trip (ms)  min/avg/max = %d/%0.1f/%d" % (
             myStats.minTime, myStats.totTime/myStats.pktsRcvd, myStats.maxTime
         ))
-    escreveArquivo(myStats.minTime, myStats.totTime/myStats.pktsRcvd, myStats.maxTime)
+    
+   
+    lista.append({'Minimo':myStats.minTime , 'Media':myStats.totTime/myStats.pktsRcvd, 'Maximo': myStats.maxTime})
+
     print("")
     return
 
@@ -364,13 +369,18 @@ def verificaHost(hostname):
 
 #=============================================================================#
 
-def escreveArquivo(minimo, media, maximo):
- arquivo = open('dataset.txt','a')
- arquivo.write(str(minimo) + '\n')
- arquivo.write(str(media) + '\n')
- arquivo.write(str(maximo) + '\n')
- arquivo.close()
-
+def escreveArquivo():
+    
+    print(lista)
+    with open('names.csv', 'w', newline='') as csvfile:
+        fieldnames = ['Minimo', 'Media', 'Maximo' ]
+        writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter =';',quotechar =',',quoting=csv.QUOTE_MINIMAL)
+        
+        writer.writeheader()
+        for dicts in lista:
+            for valores in dicts.values():
+                if ('Minino' in dicts.keys()):
+                  writer.writerow({'Minimo':  round(valores, 2)})
 
 #=============================================================================#
 
@@ -390,6 +400,8 @@ def main():
     ping(verificaHost('localhost'), timeout=3000) # tentativa de ping no localhost
     ping(verificaHost('fla2019.com'), timeout=3000) # pingando em sites que não existem 
     ping(verificaHost('ZeldaGOT.com'), timeout=3000) # pingando em sites que não existem
+
+    escreveArquivo()
 
 if __name__ == '__main__':
     main()
