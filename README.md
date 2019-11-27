@@ -8,7 +8,6 @@
 que dá além de informar se aquele ip está funcional ou não, ele dá algumas informações estatísticas que não ajudam entender o que está acontencendo com cada de um nossos pacotes que foram enviados.
 
 ## Pré-requisitos
-    <p>.</p>
 * Para a execução é necessário utilizar Python 3 na versão inferior a 3.8
 * Para plotar o gráfico necessário baixar _pip install matplotlib_ em: <https://pypi.org/project/matplotlib/>
 
@@ -16,8 +15,8 @@ que dá além de informar se aquele ip está funcional ou não, ele dá algumas 
 * Rodar o comnado _py ping_.py
 
 ## Autoria e Contribuições
-<p>Nomes:</p>
-* Maycon Prata
+<h4>Nomes:</h4>
+* Rodar o comnado _py ping_.py
 
  
 
