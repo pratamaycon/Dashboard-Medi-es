@@ -13,7 +13,7 @@ que dá além de informar se aquele ip está funcional ou não, ele dá algumas 
 * Para plotar o gráfico necessário baixar _pip install matplotlib_ em: <https://pypi.org/project/matplotlib/>
 
 ## Instruções de Instalação
-* Rodar o comnado _py ping_.py
+* Rodar o comando _py ping_.py
 
 ## Autoria e Contribuições
 <p>Nomes:</p>
