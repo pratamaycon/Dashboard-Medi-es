@@ -15,7 +15,8 @@ que dá além de informar se aquele ip está funcional ou não, ele dá algumas 
 * Rodar o comnado _py ping_.py
 
 ## Autoria e Contribuições
-<h4>Nomes:</h4>
+<p>Nomes:</p>
+
 * Rodar o comnado _py ping_.py
 
  
