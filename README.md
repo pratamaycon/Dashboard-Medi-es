@@ -5,14 +5,15 @@
 
 ## Descrição
 
-<p>Nosso objetivo é medir o desempenho da rede de ip pré definidos, assim criamos uma ferramenta que simula um ping igual do Windows, por exemplo, que dá além de informar se aquele endereço ip está funcional ou não, ele dá algumas informações estatísticas que ajudam entender o que está acontencendo com cada de um nossos pacotes que foram enviados.</p>
+<p>Nosso objetivo é medir o desempenho da rede de ip pré definidos, assim criamos uma ferramenta que simula um ping igual do CMD Windows, por exemplo, que dá além de informar se aquele endereço ip está funcional ou não, ele dá algumas informações estatísticas que ajudam entender o que está acontencendo com cada de um nossos pacotes que foram enviados.</p>
 
 ## Pré-requisitos
 * Para a execução é necessário utilizar Python 3 na versão inferior a 3.8
 * Versão Recomedada _Python 3.6_
-* Para plotar o gráfico necessário baixar _pip install matplotlib_ mais informações em: <https://pypi.org/project/matplotlib/>
-* Baixar Módulo _numpy_ com o comando _pip install numpy_ mais informações em: <https://pypi.org/project/numpy/>
-* Baixar Módulo _pandas_ com o comando _pip install pandas_ mais informações em: <https://pypi.org/project/pandas/>
+* Para plotar o gráfico necessário baixar _pip install matplotlib_ **mais informações** em: [Módulo matplotlib](https://pypi.org/project/matplotlib/)
+* Baixar Módulo _numpy_ com o comando _pip install numpy_ **mais informações** em: [Módulo numpy](https://pypi.org/project/numpy/)
+* Baixar Módulo _pandas_ com o comando _pip install pandas_ **mais informações** em: [Módulo pandas](https://pypi.org/project/pandas/)
+
 
 ## Instruções de Execução
 * Rodar o comando _py ping_.py
