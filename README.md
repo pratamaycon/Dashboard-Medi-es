@@ -5,7 +5,13 @@
 
 ## Descrição
 
-<p>Nosso objetivo é medir o desempenho da rede de ip pré definidos, assim criamos uma ferramenta que simula um ping igual do CMD Windows, por exemplo, que dá além de informar se aquele endereço ip está funcional ou não, ele dá algumas informações estatísticas que ajudam entender o que está acontencendo com cada de um nossos pacotes que foram enviados.</p>
+<p>
+ 
+Nosso objetivo é medir o desempenho da rede de ip pré definidos, enviamos pacotes para os ip destino especificados e escutamos suas respostas se o ip destino estiver ativo, recebemos uma resposta do solicitando e se não,isso irá gerar diferentes exceções de acordo com os possíveis problemas, como por exemplo, ip destino ou host que não existe. O solicitante irá nos retornar uma mensagem assim "A solicitação ping não pôde encontrar o (Nome do Host). Verifique o nome e tente novamente.". Além disso, após essa verificação o programa exibe prints no console exibindo dados referente ao solicitante esses dados são referentes ao tamanho do pacotes, ip destino, número de sequencia, tempo de vida e a latência que seriam todos os tempos dados em milisegundos. Essa informações de latência posteriormente são usadas para gerar um arquivo csv que é gerado toda vez após a execução do ping, e esse arquivo será utilizado como um dataset para a construção de um dashboard referente ao tempo de Minimo, Médio e Máximo de cada envio e sua resposta.
+
+</p>
+
+<p></p>
 
 ## Pré-requisitos
 * Para a execução é necessário utilizar Python 3 na versão inferior a 3.8
