@@ -22,8 +22,9 @@
 <p>Nomes:</p>
 
 * Maycon Prata
-
- 
+* Rafael Oliveira Neto
+* Yuan Stewart Pereira Cardoso
+* Wagner Rangel Junior
 
 
 
