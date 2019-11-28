@@ -10,6 +10,8 @@
 ## Pré-requisitos
 * Para a execução é necessário utilizar Python 3 na versão inferior a 3.8
 * Para plotar o gráfico necessário baixar _pip install matplotlib_ em: <https://pypi.org/project/matplotlib/>
+* Baixar Módulo _numpy_ com o comando _pip install numpy_ em: <https://pypi.org/project/numpy/>
+* Baixar Módulo _pandas_ com o comando _pip install pandas_ em: <https://pypi.org/project/pandas/>
 
 ## Instruções de Instalação
 * Rodar o comando _py ping_.py
