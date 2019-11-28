@@ -27,7 +27,7 @@ Além disso, após essa verificação o programa exibe prints no console exibind
 
 
 ## Instruções de Execução
-**Dependendo da Configuração da sua Váriavel de Ambiente pode ser usar _python_ ou _py_ para rodar os programas em python 3**
+**Dependendo da Configuração da sua Váriavel de Ambiente pode se usar _python_ ou _py_ para rodar os programas em python 3**
 * Rodar o comando _py ping_.py
 * Rodar o comando _py dash_.py
 
