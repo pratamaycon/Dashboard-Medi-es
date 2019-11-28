@@ -1,7 +1,7 @@
 # Trabalho Redes de Computadores 1 2019.1
 
 ## Título
-<p>Medição de desempenho de rede.</p>
+<h2>Medição de desempenho de rede.</h2>
 
 ## Descrição
 
