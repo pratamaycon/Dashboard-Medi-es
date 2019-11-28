@@ -14,7 +14,7 @@
 * Baixar Módulo _numpy_ com o comando _pip install numpy_ mais informações em: <https://pypi.org/project/numpy/>
 * Baixar Módulo _pandas_ com o comando _pip install pandas_ mais informações em: <https://pypi.org/project/pandas/>
 
-## Instruções de Instalação
+## Instruções de Execução
 * Rodar o comando _py ping_.py
 * Rodar o comando _py dash_.py
 
