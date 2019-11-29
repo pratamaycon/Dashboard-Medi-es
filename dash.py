@@ -1,14 +1,10 @@
 
-##import pandas as pd
-##from matplotlib import pyplot as plt
-##from matplotlib import style 
-import numpy as np
 import csv
-import numpy as np
-import pandas as pd
+import matplotlib
 import matplotlib.pyplot as plt
+import numpy as np
 
-dados =[]
+dados = []
 with open('dataset.csv', newline='') as f:
     reader = csv.reader(f, delimiter=';', quoting=csv.QUOTE_NONE)
     for row in reader:
@@ -16,40 +12,29 @@ with open('dataset.csv', newline='') as f:
             if i != 'Minimo' and  i !="Media" and i !="Maximo" :
                 dados.append(i)
 
-metricas = ['Minimo1','Media1','Maximo1','Minimo2','Media2','Maximo2','Minimo3','Media3','Maximo3','Minimo4','Media4','Maximo4']
-x =np.arange(len(metricas))
-# set plot size for the plot
-plt.rcParams["figure.figsize"] = (10, 10)
-
-barWidth = 0.35
+labels = ['Request 1', 'Request 2', 'Request 3', 'Request 4']
+minimo = [ dados[0], dados[3], dados[6], dados[9] ]
+media = [ dados[1], dados[4], dados[7], dados[10] ]
+maximo = [ dados[2], dados[5], dados[8], dados[11] ]
 
 
-# create the plot space upon which to plot the data
+x = np.arange(len(labels))  # the label locations
+width = 0.35  # the width of the bars
+
 fig, ax = plt.subplots()
-
-rects1 = ax.bar(x - barWidth/2, dados, barWidth, label='Men')
-rects2 = ax.bar(x + barWidth/2, dados, barWidth, label='Women')
-
-# add the x-axis and the y-axis to the plot
-ax.bar(metricas, dados, color="green")
-#plt.xticks([r + barWidth for r in range (len(dados))],[ "Resultado 1","Resultado 2","Resultado 3","Resultado 4"])
-plt.title('Request mais rápido e mais demorado')
-plt.xlabel('Medidas de resultado')
-plt.ylabel(' Ping (mms)')
-plt.legend()
-
-def autolabel(rects):
-    """Attach a text label above each bar in *rects*, displaying its height."""
-    for rect in rects:
-        height = rect.get_height()
-        ax.annotate('{}'.format(height),
-                    #xy=(rect.get_x() + rect.get_width() / 2, height),
-                    xytext=(0, 3),  # 3 points vertical offset
-                    textcoords="offset points",
-                    ha='center', va='bottom')
+rects1 = ax.bar(x - width/2, minimo, width, label='mínimo')
+rects2 = ax.bar(x + width/4, media, width, label='média')
+rects3 = ax.bar(x + width, maximo, width, label='máximo')
 
 
-autolabel(rects1)
-autolabel(rects2)
+# Add some text for labels, title and custom x-axis tick labels, etc.
+ax.set_title('Gráfico de desempenho de cada request e a relação de tempo min, med, max')
+ax.set_ylabel('Latência (ms)')
+ax.set_xlabel('Número de Requests (Em ordem de Execução)')
+ax.set_xticks(x)
+ax.set_xticklabels(labels)
+ax.legend()
 
-plt.show() 
+fig.tight_layout()
+
+plt.show()

@@ -4,8 +4,7 @@
 <p>Medição de desempenho de rede.</p>
 
 ## Descrição
-
-<p>:Nosso objetivo é medir o desempenho da rede de ip pré definidos, acima criamos uma ferramenta que simula um ping igual do *CMD Windows* que dá além de informar se aquele ip está funcional ou não, ele dá algumas informações estatísticas que não ajudam entender o que está acontencendo com cada de um nossos pacotes que foram enviados.:</p>
+<p>Nosso objetivo é medir o desempenho da rede de ip pré definidos, acima criamos uma ferramenta que simula um ping igual do CMD Windows que dá além de informar se aquele ip está funcional ou não, ele dá algumas informações estatísticas que não ajudam entender o que está acontencendo com cada de um nossos pacotes que foram enviados.</p>
 
 ## Pré-requisitos
 * Para a execução é necessário utilizar Python 3 na versão inferior a 3.8
