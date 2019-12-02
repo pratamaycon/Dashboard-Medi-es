@@ -409,7 +409,7 @@ def main():
 
     ping = verbose_ping 
     ping(verificaHost('www.wikipedia.org'), timeout=3000) # tentativa de ping no wikipedia
-    ping(verificaHost('www.amazon.com'), timeout=3000) # tentativa de ping na amazon
+    ping(verificaHost('99.84.24.9'), timeout=3000) # tentativa de ping ip na amazon
     ping(verificaHost('www.google.com'), timeout=3000) # tentativa de ping no google
     ping(verificaHost('localhost'), timeout=3000) # tentativa de ping no localhost
     ping(verificaHost('fla2019.com'), timeout=3000) # pingando em sites que não existem 
