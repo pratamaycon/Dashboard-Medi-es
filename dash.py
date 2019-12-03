@@ -35,6 +35,8 @@ ax.set_xticks(x)
 ax.set_xticklabels(labels)
 ax.legend()
 
+
+
 fig.tight_layout()
 
 plt.show()
