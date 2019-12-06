@@ -132,24 +132,17 @@ def send_one_ping(mySocket, destIP, myID, mySeqNumber, packet_size):
    
     myChecksum = 0
 
-    # Make a dummy heder with a 0 checksum.
+    # Faça um heder fictício com uma soma de verificação 0
     header = struct.pack(
         "!BBHHH", ICMP_ECHO, 0, myChecksum, myID, mySeqNumber
     )
 
     padBytes = []
     startVal = 0x42
-    # 'cose of the string/byte changes in python 2/3 we have
-    # to build the data differnely for different version
-    # or it will make packets with unexpected size.
-    if sys.version[:1] == '2':
-        bytes = struct.calcsize("d")
-        data = ((packet_size - 8) - bytes) * "Q"
-        data = struct.pack("d", default_timer()) + data
-    else:
-        for i in range(startVal, startVal + (packet_size-8)):
-            padBytes += [(i & 0xff)]  # Keep chars in the 0-255 range
-        data = bytearray(padBytes)
+ 
+    for i in range(startVal, startVal + (packet_size-8)):
+            padBytes += [(i & 0xff)]  # Mantenha os caracteres no intervalo de 0 a 255
+    data = bytearray(padBytes)
 
     # Calcule a soma de verificação nos dados e no cabeçalho fictício.
     myChecksum = checksum(header + data)  # A soma de verificação está em ordem de rede
