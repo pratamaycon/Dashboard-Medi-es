@@ -345,7 +345,7 @@ def escreveArquivo():
                     medio = round(tempValores[i],2)  # coloca os valores da listaMetricas percorrida valores na váriavel medio
                 if 'Maximo' == tempMetricas[i]:
                     maximo = round(tempValores[i],2)  # coloca os valores da listaMetricas percorrida valores na váriavel máximo
-            writer.writerow({'Minimo': minimo, 'Media': medio, 'Maximo': maximo }) # escreve por linha em formato dicionário
+            writer.writerow({'Minimo': minimo, 'Media': medio, 'Maximo': maximo }) # escreve por linha em formato dicionário, atribuindo cada valor a sua chave especificada em fieldnames
         csvfile.close()
 
 #=============================================================================#
