@@ -1,4 +1,4 @@
-import csv
+import csv # Módulo csv
 import os # Módulos com funções do SO
 import sys # Este módulo fornece acesso a algumas variáveis ​​usadas ou mantidas pelo interpretador.
 import socket # Módulo de implementação para operações de soquete.
@@ -15,9 +15,9 @@ lista = []
 NUM_PACKETS = 4    # números de pacotes
 PACKET_SIZE = 64   # Tamanho de pacotes
 WAIT_TIMEOUT = 3.0  # tempo de espera para timeout
-ICMP_ECHO = 8  # Echo request (per RFC792)
-ICMP_MAX_RECV = 2048  # Max size of incoming buffer
-MAX_SLEEP = 1000
+ICMP_ECHO = 8  # Echo de requisição
+ICMP_MAX_RECV = 2048  # Tamanho máximo do buffer de entrada
+MAX_SLEEP = 1000 # Máximo tempo de espera
 
 
 class MyStats:
@@ -83,42 +83,52 @@ def atraso(myStats, destIP, hostname, timeout, mySeqNumber, packet_size, quiet=F
     """
     delay = None
 
+    """
+    socket.AF_INET, é uma string que representa um nome de host na notação de domínio da Internet 
+    como 'daring.cwi.nl' ou um endereço IPv4 como '100.50.200.5' e porta é um inteiro."""
+    """
+    socket.getprotobyname(protocolname), Traduz um nome de protocolo da Internet (por exemplo, 'icmp') 
+    para uma constante adequada para passar como o terceiro argumento (opcional) 
+    para a função socket (). Isso geralmente é necessário apenas para soquetes abertos 
+    no modo "bruto" (SOCK_RAW); para os modos normais de soquete, o protocolo correto é 
+    escolhido automaticamente se o protocolo for omitido ou zero.
+    """
+
     try: 
-        mySocket = socket.socket(
-            socket.AF_INET, socket.SOCK_RAW, socket.getprotobyname("icmp"))
+        mySocket = socket.socket(socket.AF_INET, socket.SOCK_RAW, socket.getprotobyname("icmp"))
     except socket.error as e:
-        print("failed. (socket error: '%s')" % e.args[1])
-        raise
+        print("Falhou!!!. (Erro de socket: '%s')" % e.args[1])
 
-    my_ID = os.getpid() & 0xFFFF
+    my_ID = os.getpid() & 0xFFFF # retorna a identificação do processo atual.
 
-    sentTime = send_one_ping(mySocket, destIP, my_ID, mySeqNumber, packet_size)
+    sentTime = send_one_ping(mySocket, destIP, my_ID, mySeqNumber, packet_size) # retorna o tempo enviado
     if sentTime == None:
         mySocket.close()
         return delay
 
-    myStats.pktsSent += 1
+    myStats.pktsSent += 1 # contador de pacotes enviados
 
+    # retorna o tempo de resposta, o tamanho dado, o ping pingado, o numero de seq, id e timeout 
     recvTime, dataSize, iphSrcIP, icmpSeqNumber, iphTTL = receive_one_ping(
-        mySocket, my_ID, timeout)
-
+        mySocket, my_ID, timeout) 
     mySocket.close()
 
-    if recvTime:
-        delay = (recvTime-sentTime)*1000
+    if recvTime: # tempo de resposta for verdadeiro
+        delay = (recvTime-sentTime)*1000 # tempo de resposta - tempo de envio = delay(ms)
         if not quiet:
-            print("%d bytes de %s: icmp_seq=%d ttl=%d time=%d ms" % (
+            # exibição das respostas do ping
+            print("Resposta com %d bytes de %s: icmp_seq=%d ttl=%d time=%d ms" % (
                 dataSize, socket.inet_ntoa(struct.pack("!I", iphSrcIP)), icmpSeqNumber, iphTTL, delay)
             )
-        myStats.pktsRcvd += 1
-        myStats.totTime += delay
+        myStats.pktsRcvd += 1 # contador de pacotes recebidos
+        myStats.totTime += delay # contador do tempo total (todos os times desse host) 
         if myStats.minTime > delay:
-            myStats.minTime = delay
-        if myStats.maxTime < delay:
-            myStats.maxTime = delay
+            myStats.minTime = delay # contador tempo mínimo
+        if myStats.maxTime < delay: 
+            myStats.maxTime = delay # contador tempo máximo
     else:
         delay = None
-        print("Request timed out.")
+        print("Requesição excedeu o tempo limite.")
 
     return delay
 
@@ -130,9 +140,10 @@ def send_one_ping(mySocket, destIP, myID, mySeqNumber, packet_size):
     Envia um ping para o> destIP <fornecido
     """
    
-    myChecksum = 0
+    myChecksum = 0 # contador da soma de verificação
 
-    # Faça um heder fictício com uma soma de verificação 0
+    # Faça um cabeçalho fictício com uma soma de verificação 0
+    # Retorne uma string contendo os valores compactados de acordo com o formato especificado. 
     header = struct.pack(
         "!BBHHH", ICMP_ECHO, 0, myChecksum, myID, mySeqNumber
     )
@@ -144,23 +155,28 @@ def send_one_ping(mySocket, destIP, myID, mySeqNumber, packet_size):
             padBytes += [(i & 0xff)]  # Mantenha os caracteres no intervalo de 0 a 255
     data = bytearray(padBytes)
 
-    # Calcule a soma de verificação nos dados e no cabeçalho fictício.
+    # Calculo a soma de verificação nos dados e no cabeçalho fictício.
     myChecksum = checksum(header + data)  # A soma de verificação está em ordem de rede
 
-    # Agora que temos a soma de verificação correta, colocamos isso. É apenas mais fácil
-    # para criar um novo cabeçalho do que colocá-lo no modelo.
+    # Agora que temos a soma de verificação correta, colocamos isso. 
+    # É apenas mais fácil, para criar um novo cabeçalho do que colocá-lo no modelo.
     header = struct.pack(
         "!BBHHH", ICMP_ECHO, 0, myChecksum, myID, mySeqNumber
     )
 
+    # pacotes com a integridade dos dados verificada e com cabeçalho checksum adicionado.
     packet = header + data
 
-    sendTime = default_timer()
+    sendTime = default_timer() # Essa função retorna o tempo de espera junto com o tempo da CPU e depende da plataforma. 
 
     try:
+        """ 
+        socket.sendto(bytes, address)
+        Retornar o número de bytes enviados.
+        """
         mySocket.sendto(packet, (destIP, 1))
     except socket.error as e:
-        print("General failure (%s)" % (e.args[1]))
+        print("Falha Geral (%s)" % (e.args[1]))
         return
 
     return sendTime
@@ -170,21 +186,31 @@ def send_one_ping(mySocket, destIP, myID, mySeqNumber, packet_size):
 
 def receive_one_ping(mySocket, myID, timeout):
     """
-    Receba o ping do soquete. Tempo limite = em ms
+    Recebe o ping do soquete. Tempo limite = em ms
     """
     timeLeft = timeout/1000
 
     while True:  # Loop enquanto aguarda o pacote ou o timeout 
-        startedSelect = default_timer()
+        startedSelect = default_timer() # Essa função retorna o tempo de espera junto com o tempo da CPU e depende da plataforma. 
+
         whatReady = select.select([mySocket], [], [], timeLeft)
         howLongInSelect = (default_timer() - startedSelect)
         if whatReady[0] == []:  # timeout
             return None, 0, 0, 0, 0
 
-        timeReceived = default_timer()
+        timeReceived = default_timer() # Essa função retorna o tempo de espera junto com o tempo da CPU e depende da plataforma. 
 
-        recPacket, addr = mySocket.recvfrom(ICMP_MAX_RECV)
+        """
+        Receba dados do soquete. O valor de retorno é um par (bytes, endereço) em que bytes é um objeto de bytes que representa
+        os dados recebidos e endereço é o endereço do soquete que envia os dados 
+        """
+        recPacket, addr = mySocket.recvfrom(ICMP_MAX_RECV) 
 
+        """
+        struct.unpack( fmt , string ) 
+        Descompacte a sequência (presumivelmente empacotada por ) de acordo com o formato fornecido. 
+        O resultado é uma tupla, mesmo que contenha exatamente um item.
+        """
         ipHeader = recPacket[:20]
         iphVersion, iphTypeOfSvc, iphLength, \
             iphID, iphFlags, iphTTL, iphProtocol, \
@@ -200,11 +226,12 @@ def receive_one_ping(mySocket, myID, timeout):
 
         if icmpPacketID == myID:
             dataSize = len(recPacket) - 28
+            # retorna o tempo de resposta, o tamanho dado, o ping pingado, o numero de seq, id e timeout  
             return timeReceived, (dataSize+8), iphSrcIP, icmpSeqNumber, iphTTL
 
         timeLeft = timeLeft - howLongInSelect
         if timeLeft <= 0:
-            return None, 0, 0, 0, 0
+            return None, 0, 0, 0, 0 # retorna nada 
 
 #=============================================================================#
 
@@ -213,11 +240,11 @@ def dump_stats(myStats):
     """
     Mostrar estatísticas quando pings são feitos
     """
-    print("\n----%s PYTHON PING Estatisticas----" % (myStats.thisIP))
+    print("\n----%s PYTHON 3 PING Estatisticas----" % (myStats.thisIP))
 
     if myStats.pktsSent > 0:
         myStats.fracLoss = (myStats.pktsSent -
-                            myStats.pktsRcvd)/myStats.pktsSent
+                            myStats.pktsRcvd)/myStats.pktsSent # (pacotes enviados - pacotes recebidos) / pacotes enviados = fracassos
 
     print("%d pacotes transmitidos, %d pacotes recebidos, %0.1f%% pacotes perdidos" % (
         myStats.pktsSent, myStats.pktsRcvd, 100.0 * myStats.fracLoss
@@ -225,10 +252,10 @@ def dump_stats(myStats):
 
     if myStats.pktsRcvd > 0:
         print("Round-trip time (RTT) (ms)  min/media/max = %d/%0.1f/%d" % (
-            myStats.minTime, myStats.totTime/myStats.pktsRcvd, myStats.maxTime
+            myStats.minTime, myStats.totTime/myStats.pktsRcvd, myStats.maxTime # mínimo, médio e máximo
         ))
     
-   
+    # armazenando esses dados na lista
     lista.append({'Minimo':myStats.minTime , 'Media':myStats.totTime/myStats.pktsRcvd, 'Maximo': myStats.maxTime})
 
     print("")
@@ -238,7 +265,7 @@ def dump_stats(myStats):
 
 
 def verbose_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
-                 packet_size=PACKET_SIZE, path_finder=False):
+                 packet_size=PACKET_SIZE):
     """
     Envia > contador <ping para> destIP <com o tempo limite especificado> e exiba
     o resultado.
@@ -249,9 +276,9 @@ def verbose_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
 
     try:
         destIP = socket.gethostbyname(hostname) # Pega endereco do IP do host
-        print("\nPYTHON PING %s (%s): %d com bytes de dados" %
+        print("\nPYTHON 3 PING %s (%s): %d com bytes de dados" %
               (hostname, destIP, packet_size)) # nome do host, ip destino e tamnanho do pacote 
-    except socket.gaierror as e:
+    except socket.gaierror as e: # Essa gerada para erros ao host
         print(hostname) # nome do host
         print()
         return
@@ -294,30 +321,31 @@ def escreveArquivo():
     escreve num arquivo csv as estatísticas geradas pelo programa ping
     """
 
-    minimo = 0
-    medio = 0
-    maximo = 0     
+    minimo = 0 # contador mínimo
+    medio = 0   # contador médio
+    maximo = 0  # # contador máximo
 
     with open('dataset.csv', 'w', newline='') as csvfile:
-        fieldnames = ['Minimo', 'Media', 'Maximo' ]
+        fieldnames = ['Minimo', 'Media', 'Maximo' ] # cabeçalho do arquivo
+        # escrevendo o arquivo com as informações do dicionário lista
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames, delimiter =';',quotechar =',',quoting=csv.QUOTE_MINIMAL)
         
-        writer.writeheader()
+        writer.writeheader() # ler o cabeçalho
         for dicts in lista:
             tempMetricas = []
             tempValores = []
             for keys in dicts.keys():
-                tempMetricas.append(keys)
+                tempMetricas.append(keys)   # pega as chaves e coloca na lista de tempValores
             for valores in dicts.values():
-                tempValores.append(valores)
+                tempValores.append(valores) # pega as valores e coloca na lista de tempMetricas
             for i in range(len(tempMetricas)):
                 if 'Minimo' == tempMetricas[i]:
-                    minimo = round(tempValores[i],2)
+                    minimo = round(tempValores[i],2) # coloca os valores da listaMetricas percorrida valores na váriavel mínimo
                 if 'Media' == tempMetricas[i]:
-                    medio = round(tempValores[i],2)
+                    medio = round(tempValores[i],2)  # coloca os valores da listaMetricas percorrida valores na váriavel medio
                 if 'Maximo' == tempMetricas[i]:
-                    maximo = round(tempValores[i],2)
-            writer.writerow({'Minimo': minimo, 'Media': medio, 'Maximo': maximo })
+                    maximo = round(tempValores[i],2)  # coloca os valores da listaMetricas percorrida valores na váriavel máximo
+            writer.writerow({'Minimo': minimo, 'Media': medio, 'Maximo': maximo }) # escreve por linha em formato dicionário
         csvfile.close()
 
 #=============================================================================#
