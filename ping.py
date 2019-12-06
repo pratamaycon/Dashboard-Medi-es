@@ -5,7 +5,6 @@ import socket # Módulo de implementação para operações de soquete.
 import struct # Funções para converter entre valores Python e estruturas C
 import select # Este módulo suporta E / S assíncronos
 import time # Este módulo fornece várias funções relacionadas ao tempo
-import signal # Este módulo fornece mecanismos para usar manipuladores de sinal em Python
 
 if sys.platform == "win32":     # Identificador do SO 
     default_timer = time.clock  # No Windows, o melhor timer é o time.clock ()
@@ -16,26 +15,20 @@ lista = []
 NUM_PACKETS = 4    # números de pacotes
 PACKET_SIZE = 64   # Tamanho de pacotes
 WAIT_TIMEOUT = 3.0  # tempo de espera para timeout
-
-#=============================================================================#
-# ICMP parameters
-
-ICMP_ECHOREPLY = 0  # Echo reply (per RFC792)
 ICMP_ECHO = 8  # Echo request (per RFC792)
 ICMP_MAX_RECV = 2048  # Max size of incoming buffer
-
 MAX_SLEEP = 1000
 
 
 class MyStats:
-    thisIP = "0.0.0.0"  # Máscara do IP
-    pktsSent = 0    # pacotes enviados
-    pktsRcvd = 0    # pacotes recebidos
-    minTime = 999999999 # tempo mínimo
-    maxTime = 0     # tempo máximo
-    totTime = 0     # tempo total
-    avrgTime = 0    # tempo médio
-    fracLoss = 1.0  # pacotes que fracassaram
+    thisIP = "0.0.0.0"          # Máscara do IP
+    pktsSent = 0                # pacotes enviados
+    pktsRcvd = 0                # pacotes recebidos
+    minTime = 999999999         # tempo mínimo
+    maxTime = 0                 # tempo máximo
+    totTime = 0                 # tempo total
+    avrgTime = 0                # tempo médio
+    fracLoss = 1.0              # pacotes que fracassaram
 
 
 myStats = MyStats  # atribuindo a Class MyStats a um Objeto myStats
@@ -44,8 +37,10 @@ myStats = MyStats  # atribuindo a Class MyStats a um Objeto myStats
 
 
 def checksum(source_string): # verificar a integridade de dados transmitidos
-    """Se um arquivo é exatamente o mesmo arquivo depois de uma transferência. 
-    Para verificar se não foi alterado por terceiros ou se não está corrompido."""
+    """
+    Verifica a integridade de dados transmitidos através e retorna um valor númerico
+    que se refere a ordem do dado e seu conteúdo, na hora da sua transmissão
+    """
     countTo = (int(len(source_string)/2))*2 # tamanho do bytes de dados
     soma = 0   
     count = 0  
@@ -74,10 +69,10 @@ def checksum(source_string): # verificar a integridade de dados transmitidos
 
     soma = (soma >> 16) + (soma & 0xffff)    
     soma += (soma >> 16)                  
-    resposta = ~soma & 0xffff               
-    resposta = socket.htons(resposta)
+    res = ~soma & 0xffff               
+    res = socket.htons(res)
 
-    return resposta
+    return res
 
 #=============================================================================#
 
@@ -112,7 +107,7 @@ def atraso(myStats, destIP, hostname, timeout, mySeqNumber, packet_size, quiet=F
     if recvTime:
         delay = (recvTime-sentTime)*1000
         if not quiet:
-            print("%d bytes from %s: icmp_seq=%d ttl=%d time=%d ms" % (
+            print("%d bytes de %s: icmp_seq=%d ttl=%d time=%d ms" % (
                 dataSize, socket.inet_ntoa(struct.pack("!I", iphSrcIP)), icmpSeqNumber, iphTTL, delay)
             )
         myStats.pktsRcvd += 1
@@ -132,12 +127,9 @@ def atraso(myStats, destIP, hostname, timeout, mySeqNumber, packet_size, quiet=F
 
 def send_one_ping(mySocket, destIP, myID, mySeqNumber, packet_size):
     """
-    Send one ping to the given >destIP<.
+    Envia um ping para o> destIP <fornecido
     """
-    #destIP  =  socket.gethostbyname(destIP)
-
-    # Header is type (8), code (8), checksum (16), id (16), sequence (16)
-    # (packet_size - 8) - Remove header size from packet size
+   
     myChecksum = 0
 
     # Make a dummy heder with a 0 checksum.
@@ -157,14 +149,13 @@ def send_one_ping(mySocket, destIP, myID, mySeqNumber, packet_size):
     else:
         for i in range(startVal, startVal + (packet_size-8)):
             padBytes += [(i & 0xff)]  # Keep chars in the 0-255 range
-        #data = bytes(padBytes)
         data = bytearray(padBytes)
 
-    # Calculate the checksum on the data and the dummy header.
-    myChecksum = checksum(header + data)  # Checksum is in network order
+    # Calcule a soma de verificação nos dados e no cabeçalho fictício.
+    myChecksum = checksum(header + data)  # A soma de verificação está em ordem de rede
 
-    # Now that we have the right checksum, we put that in. It's just easier
-    # to make up a new header than to stuff it into the dummy.
+    # Agora que temos a soma de verificação correta, colocamos isso. É apenas mais fácil
+    # para criar um novo cabeçalho do que colocá-lo no modelo.
     header = struct.pack(
         "!BBHHH", ICMP_ECHO, 0, myChecksum, myID, mySeqNumber
     )
@@ -174,7 +165,6 @@ def send_one_ping(mySocket, destIP, myID, mySeqNumber, packet_size):
     sendTime = default_timer()
 
     try:
-        # Port number is irrelevant for ICMP
         mySocket.sendto(packet, (destIP, 1))
     except socket.error as e:
         print("General failure (%s)" % (e.args[1]))
@@ -187,15 +177,15 @@ def send_one_ping(mySocket, destIP, myID, mySeqNumber, packet_size):
 
 def receive_one_ping(mySocket, myID, timeout):
     """
-    Receive the ping from the socket. Timeout = in ms
+    Receba o ping do soquete. Tempo limite = em ms
     """
     timeLeft = timeout/1000
 
-    while True:  # Loop while waiting for packet or timeout
+    while True:  # Loop enquanto aguarda o pacote ou o timeout 
         startedSelect = default_timer()
         whatReady = select.select([mySocket], [], [], timeLeft)
         howLongInSelect = (default_timer() - startedSelect)
-        if whatReady[0] == []:  # Timeout
+        if whatReady[0] == []:  # timeout
             return None, 0, 0, 0, 0
 
         timeReceived = default_timer()
@@ -215,9 +205,8 @@ def receive_one_ping(mySocket, myID, timeout):
                 "!BBHHH", icmpHeader
             )
 
-        if icmpPacketID == myID:  # Our packet
+        if icmpPacketID == myID:
             dataSize = len(recPacket) - 28
-            #print (len(recPacket.encode()))
             return timeReceived, (dataSize+8), iphSrcIP, icmpSeqNumber, iphTTL
 
         timeLeft = timeLeft - howLongInSelect
@@ -229,20 +218,20 @@ def receive_one_ping(mySocket, myID, timeout):
 
 def dump_stats(myStats):
     """
-    Show stats when pings are done
+    Mostrar estatísticas quando pings são feitos
     """
-    print("\n----%s PYTHON PING Statistics----" % (myStats.thisIP))
+    print("\n----%s PYTHON PING Estatisticas----" % (myStats.thisIP))
 
     if myStats.pktsSent > 0:
         myStats.fracLoss = (myStats.pktsSent -
                             myStats.pktsRcvd)/myStats.pktsSent
 
-    print("%d packets transmitted, %d packets received, %0.1f%% packet loss" % (
+    print("%d pacotes transmitidos, %d pacotes recebidos, %0.1f%% pacotes perdidos" % (
         myStats.pktsSent, myStats.pktsRcvd, 100.0 * myStats.fracLoss
     ))
 
     if myStats.pktsRcvd > 0:
-        print("round-trip (ms)  min/avg/max = %d/%0.1f/%d" % (
+        print("Round-trip time (RTT) (ms)  min/media/max = %d/%0.1f/%d" % (
             myStats.minTime, myStats.totTime/myStats.pktsRcvd, myStats.maxTime
         ))
     
@@ -255,28 +244,12 @@ def dump_stats(myStats):
 #=============================================================================#
 
 
-def signal_handler(signum, frame):
-    """
-    Handle exit via signals
-    """
-    dump_stats()
-    print("\n(Terminated with signal %d)\n" % (signum))
-    sys.exit(0)
-
-#=============================================================================#
-
-
 def verbose_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
                  packet_size=PACKET_SIZE, path_finder=False):
     """
     Envia > contador <ping para> destIP <com o tempo limite especificado> e exiba
     o resultado.
     """
-    signal.signal(signal.SIGINT, signal_handler)   # Handle Ctrl-C
-    if hasattr(signal, "SIGBREAK"):
-        # Manipular Ctrl-Break, por exemplo no Windows
-        signal.signal(signal.SIGBREAK, signal_handler)
-
     myStats = MyStats()  # Reseta o status
 
     mySeqNumber = 0  # Inicializando mySeqNumber
@@ -293,7 +266,7 @@ def verbose_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
     myStats.thisIP = destIP # atribui o ip destino do host ao ip do Objeto myStats
 
     for i in range(count):
-        delay = atraso(myStats, destIP, hostname, # 
+        delay = atraso(myStats, destIP, hostname, 
                        timeout, mySeqNumber, packet_size)
 
         if delay == None:
@@ -301,7 +274,7 @@ def verbose_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
 
         mySeqNumber += 1
 
-        # Pause for the remainder of the MAX_SLEEP period (if applicable)
+        # Aguarde para o restante do período MAX_SLEEP (se for verdade)
         if (MAX_SLEEP > delay):
             time.sleep((MAX_SLEEP - delay)/1000)
 
@@ -309,56 +282,10 @@ def verbose_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
 
 #=============================================================================#
 
-
-def quiet_ping(hostname, timeout=WAIT_TIMEOUT, count=NUM_PACKETS,
-               packet_size=PACKET_SIZE, path_finder=False):
-    """
-    Same as verbose_ping, but the results are returned as tuple
-    """
-    myStats = MyStats()  # Reset the stats
-    mySeqNumber = 0  # Starting value
-
-    try:
-        destIP = socket.gethostbyname(hostname) # Pega endereco do IP do host
-    except socket.gaierror as e:
-        return False
-
-    myStats.thisIP = destIP # Atribui o ip a propriedade do Objeto 
-
-    # This will send packet that we dont care about 0.5 seconds before it starts
-    # acrutally pinging. This is needed in big MAN/LAN networks where you sometimes
-    # loose the first packet. (while the switches find the way... :/ )
-    if path_finder:
-        fakeStats = MyStats()
-        atraso(fakeStats, destIP, hostname, timeout,
-               mySeqNumber, packet_size, quiet=True)
-        time.sleep(0.5)
-
-    for i in range(count):
-        delay = atraso(myStats, destIP, hostname, timeout,
-                       mySeqNumber, packet_size, quiet=True)
-
-        if delay == None:
-            delay = 0
-
-        mySeqNumber += 1
-
-        # Pause for the remainder of the MAX_SLEEP period (if applicable)
-        if (MAX_SLEEP > delay):
-            time.sleep((MAX_SLEEP - delay)/1000)
-
-    if myStats.pktsSent > 0:
-        myStats.fracLoss = (myStats.pktsSent -
-                            myStats.pktsRcvd)/myStats.pktsSent
-    if myStats.pktsRcvd > 0:
-        myStats.avrgTime = myStats.totTime / myStats.pktsRcvd
-
-    # return tuple(max_rtt, min_rtt, avrg_rtt, percent_lost)
-    return myStats.maxTime, myStats.minTime, myStats.avrgTime, myStats.fracLoss
-
-#=============================================================================#
-
 def verificaHost(hostname):
+ """
+ verifica se o hostname é inválido ou não 
+ """
  msg = "" # inicializando uma string vazia
  try:
   socket.gethostbyname(hostname)  # retorna o endereço de ip
@@ -370,6 +297,9 @@ def verificaHost(hostname):
 #=============================================================================#
 
 def escreveArquivo():
+    """
+    escreve num arquivo csv as estatísticas geradas pelo programa ping
+    """
 
     minimo = 0
     medio = 0
@@ -395,12 +325,7 @@ def escreveArquivo():
                 if 'Maximo' == tempMetricas[i]:
                     maximo = round(tempValores[i],2)
             writer.writerow({'Minimo': minimo, 'Media': medio, 'Maximo': maximo })
-
-#=============================================================================#
-
-def lerDataset():
-    return
-
+        csvfile.close()
 
 #=============================================================================#
 
@@ -409,7 +334,7 @@ def main():
 
     ping = verbose_ping 
     ping(verificaHost('www.wikipedia.org'), timeout=3000) # tentativa de ping no wikipedia
-    ping(verificaHost('172.217.29.100'), timeout=3000) # tentativa de ping no google via ip
+    ping(verificaHost('99.84.24.9'), timeout=3000) # tentativa de ping no ip da amazon
     ping(verificaHost('www.google.com'), timeout=3000) # tentativa de ping no google
     ping(verificaHost('localhost'), timeout=3000) # tentativa de ping no localhost
     ping(verificaHost('fla2019.com'), timeout=3000) # pingando em sites que não existem 

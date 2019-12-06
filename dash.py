@@ -12,7 +12,7 @@ with open('dataset.csv', newline='') as f:
             if i != 'Minimo' and  i !="Media" and i !="Maximo" :
                 dados.append(i)
 
-labels = ['Request 1', 'Request 2', 'Request 3', 'Request 4']
+labels = ['Wikipedia', 'Google', 'Amazon', 'LocalHost']
 minimo = [ dados[0], dados[3], dados[6], dados[9] ]
 media = [ dados[1], dados[4], dados[7], dados[10] ]
 maximo = [ dados[2], dados[5], dados[8], dados[11] ]
@@ -34,8 +34,6 @@ ax.set_xlabel('Número de Requests (Em ordem de Execução)')
 ax.set_xticks(x)
 ax.set_xticklabels(labels)
 ax.legend()
-
-
 
 fig.tight_layout()
 
