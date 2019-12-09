@@ -17,7 +17,7 @@ with open('dataset.csv', newline='') as f:
 dados = list(map(float, dados)) # converte a lista de strings em lista de números float
 
 
-labels = ['Localhost', 'Amazon', 'Google', 'Wikipédia'] # labels setadas (recomandado máximo de 4 para não estragar a visualização)
+labels = ['Localhost', 'Google', 'Amazon', 'Wikipédia'] # labels setadas (recomandado máximo de 4 para não estragar a visualização)
 minino = [dados[9], dados[6], dados[3], dados[0]]
 medio = [dados[10], dados[7], dados[4], dados[1]]
 maximo = [dados[11], dados[8], dados[5], dados[2]]
