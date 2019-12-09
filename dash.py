@@ -13,29 +13,68 @@ with open('dataset.csv', newline='') as f:
                 dados.append(i) # coloca apenas o valores em lista de dados
     f.close()
 
-labels = ['Wikipedia', 'Google', 'Amazon', 'LocalHost']
-minimo = [ dados[0], dados[3], dados[6], dados[9] ]
-media = [ dados[1], dados[4], dados[7], dados[10] ]
-maximo = [ dados[2], dados[5], dados[8], dados[11] ]
+
+dados = list(map(float, dados)) # converte a lista de strings em lista de números float
 
 
-x = np.arange(len(labels))  # os locais das etiquetas
-width = 0.35  # a largura das barras
+labels = ['Localhost', 'Amazon', 'Google', 'Wikipédia'] # labels setadas (recomandado máximo de 4 para não estragar a visualização)
+minino = [dados[9], dados[6], dados[3], dados[0]]
+medio = [dados[10], dados[7], dados[4], dados[1]]
+maximo = [dados[11], dados[8], dados[5], dados[2]]
+
+ind = np.arange(len(labels))  # os x locais para os grupos
+width = 0.35 # a largura das barras
 
 fig, ax = plt.subplots()
-rects1 = ax.bar(x - width/2, minimo, width, label='mínimo')
-rects2 = ax.bar(x + width/4, media, width, label='média')
-rects3 = ax.bar(x + width, maximo, width, label='máximo')
+rects1 = ax.bar(ind - width/2, minino, width,
+                label='Mínimo')
+rects2 = ax.bar(ind + width/4, medio, width,
+                label='Média')
+rects3 = ax.bar(ind + width, maximo, width,
+                label='Máximo')
 
 
 # Adicione um pouco de texto para etiquetas, título e etiquetas personalizadas do eixo x, etc.
 ax.set_title('Gráfico de desempenho de cada request e a relação de tempo min, med, max')
 ax.set_ylabel('Latência (ms)')
 ax.set_xlabel('Número de Requests (Em ordem de Execução)')
-ax.set_xticks(x)
+ax.set_xticks(ind)
 ax.set_xticklabels(labels)
 ax.legend()
+
+
+
+def autolabel(rects, xpos='center'):
+    """
+    Anexe um rótulo de texto acima de cada barra em * rects *, exibindo sua altura.
+    * xpos * indica qual lado colocar o texto w.r.t. o centro de
+    o bar. Pode ser um dos seguintes {'center', 'right', 'left'
+    """
+
+    ha = {'center': 'center', 'right': 'left', 'left': 'right'}
+    offset = {'center': 0, 'right': 1, 'left': -1}
+
+    for rect in rects:
+        height = rect.get_height()
+        ax.annotate('{}'.format(height),
+                    xy=(rect.get_x() + rect.get_width() / 2, height),
+                    xytext=(offset[xpos]*3, 3),  # use deslocamento de 3 pontos
+                    textcoords="offset points",  # em ambas as direções
+                    ha=ha[xpos], va='bottom')
+
+
+autolabel(rects1)
+autolabel(rects2)
+autolabel(rects3)
+
 
 fig.tight_layout()
 
 plt.show()
+
+
+
+
+
+
+
